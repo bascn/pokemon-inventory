@@ -375,6 +375,7 @@ function populateFilters(){
   };
 
   fillSelect('flt-dueno',  getUnique('dueno'),  'Todos los Dueños');
+  fillSelect('flt-edicion', getUnique('edicion'), 'Todas las Ediciones');
   fillSelect('flt-rareza', getUnique('rareza'), 'Todas las Rarezas');
   fillSelect('flt-tipo',   getUnique('tipo'),   'Todos los Tipos');
   fillSelect('flt-estado', getUnique('estado'), 'Todos los Estados');
@@ -397,12 +398,13 @@ function changePageSize() {
 function renderTable(keepPage = false){
   const q = document.getElementById('tbl-search').value.toLowerCase();
   const fDueno = document.getElementById('flt-dueno').value;
+  const fEdicion = document.getElementById('flt-edicion').value;
   const fRareza = document.getElementById('flt-rareza').value;
   const fTipo = document.getElementById('flt-tipo').value;
   const fEstado = document.getElementById('flt-estado').value;
   const fIdioma = document.getElementById('flt-idioma').value;
 
-  const currentFilterState = [q, fDueno, fRareza, fTipo, fEstado, fIdioma].join('|');
+  const currentFilterState = [q, fDueno, fEdicion, fRareza, fTipo, fEstado, fIdioma].join('|');
   if (!keepPage && currentFilterState !== lastFilterState) {
     currentPage = 1;
     lastFilterState = currentFilterState;
@@ -410,6 +412,7 @@ function renderTable(keepPage = false){
 
   const list = entries.filter(e => {
     if (fDueno  && e.dueno  !== fDueno) return false;
+    if (fEdicion && e.edicion !== fEdicion) return false;
     if (fRareza && e.rareza !== fRareza) return false;
     if (fTipo   && e.tipo   !== fTipo) return false;
     if (fEstado && e.estado !== fEstado) return false;
