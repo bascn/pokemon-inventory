@@ -230,6 +230,33 @@ td{padding:10px 13px;white-space:nowrap}
 .pag-controls{display:flex;gap:8px}
 .pag-controls button:disabled{opacity:0.4;cursor:not-allowed}
 
+/* MODAL */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,15,0.7);
+  backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:all 0.3s ease;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);
+  width:90%;max-width:850px;max-height:85vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);transform:translateY(30px);transition:all 0.3s ease;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-hdr{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;
+  justify-content:space-between;align-items:center;background:var(--s1);border-radius:var(--r) var(--r) 0 0;}
+.modal-hdr h2{font-size:1.1rem;font-weight:700;color:var(--text);}
+.btn-close{background:none;border:none;color:var(--text3);font-size:1.8rem;cursor:pointer;
+  line-height:1;padding:0 8px;transition:color 0.2s;border-radius:6px;}
+.btn-close:hover{color:var(--red);background:rgba(255,255,255,0.05);}
+.modal-body{padding:24px;overflow-y:auto;flex:1;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;}
+.insight-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--rsm);
+  padding:20px;display:flex;flex-direction:column;gap:8px;}
+.insight-icon{font-size:1.8rem;margin-bottom:4px;}
+.insight-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:700;}
+.insight-val{font-size:1.4rem;font-weight:800;color:var(--text);}
+.insight-sub{font-size:0.8rem;color:var(--text2);}
+.insight-card.gold .insight-val{color:var(--gold);}
+.insight-card.green .insight-val{color:var(--green);}
+.insight-card.purple .insight-val{color:#B67BFF;}
+
 /* EMPTY */
 .empty{padding:52px 20px;text-align:center;color:var(--text3)}
 .empty .ei{font-size:2.6rem;margin-bottom:12px;opacity:.4}

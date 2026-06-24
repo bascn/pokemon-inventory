@@ -23,6 +23,7 @@
       <div class="api-dot online" id="api-dot"></div>
       <span id="api-label">BD Local</span>
     </div>
+    <button class="btn-hdr" onclick="openStatsModal()">📊 Estadísticas</button>
     <button class="btn-hdr" onclick="exportCSV()">&#11015; Exportar CSV</button>
   </div>
 </header>
@@ -255,6 +256,21 @@
     </div>
   </div>
 </main>
+
+<!-- STATS MODAL -->
+<div class="modal-overlay" id="stats-modal" onclick="if(event.target===this) closeStatsModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>📊 Insights del Inventario</h2>
+      <button class="btn-close" onclick="closeStatsModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="stats-grid" id="stats-grid">
+        <!-- Content generated dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"><span id="toast-msg">OK</span></div>
 <script src="database.js?v=2"></script>

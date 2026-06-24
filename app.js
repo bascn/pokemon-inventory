@@ -596,6 +596,102 @@ function toast(msg, ok=true){
   toastT = setTimeout(()=>el.classList.remove('show'), 2800);
 }
 
+/* STATS MODAL */
+function openStatsModal() {
+  if (entries.length === 0) {
+    toast('No hay cartas para analizar', false);
+    return;
+  }
+  
+  // 1. Carta más valiosa (Valor 1)
+  const maxCard = [...entries].sort((a,b) => b.valor1 - a.valor1)[0];
+  
+  // 2. Edición más valiosa & Edición con más cartas
+  const edStats = {};
+  entries.forEach(e => {
+    const ed = e.edicion || 'Desconocida';
+    if (!edStats[ed]) edStats[ed] = { count: 0, val1: 0 };
+    edStats[ed].count += e.cantidad;
+    edStats[ed].val1 += (e.valor1 * e.cantidad);
+  });
+  const topEdVal1 = Object.entries(edStats).sort((a,b) => b[1].val1 - a[1].val1)[0];
+  const topEdCount = Object.entries(edStats).sort((a,b) => b[1].count - a[1].count)[0];
+  
+  // 3. Totales y Dueños
+  let totalCompra = 0, totalMercado = 0;
+  let caritoVal = 0, infeVal = 0;
+  let caritoCount = 0, infeCount = 0;
+  
+  entries.forEach(e => {
+    const q = e.cantidad;
+    // Utilizamos precioIva como referencia de costo. Si está en 0, usamos precio normal.
+    const costo = (e.precioIva > 0 ? e.precioIva : e.precio) * q;
+    totalCompra += costo;
+    totalMercado += (e.valor1 * q);
+    
+    const isC = String(e.dueno).toLowerCase() === 'carito';
+    const isI = String(e.dueno).toLowerCase() === 'infe';
+    
+    if (isC) { caritoVal += (e.valor1 * q); caritoCount += q; }
+    if (isI) { infeVal += (e.valor1 * q); infeCount += q; }
+  });
+  
+  const balance = totalMercado - totalCompra;
+  const balanceStr = balance >= 0 ? `+${csvN(balance)}` : csvN(balance);
+  const balanceClass = balance >= 0 ? 'green' : 'gold';
+  
+  const html = `
+    <div class="insight-card purple">
+      <div class="insight-icon">💎</div>
+      <div class="insight-label">Carta Más Cara</div>
+      <div class="insight-val">$${csvN(maxCard.valor1)}</div>
+      <div class="insight-sub">${esc(maxCard.nombre)} (${esc(maxCard.edicion)})</div>
+    </div>
+    
+    <div class="insight-card gold">
+      <div class="insight-icon">📈</div>
+      <div class="insight-label">Expansión Más Valiosa</div>
+      <div class="insight-val">$${csvN(topEdVal1[1].val1)}</div>
+      <div class="insight-sub">${esc(topEdVal1[0])}</div>
+    </div>
+    
+    <div class="insight-card">
+      <div class="insight-icon">📦</div>
+      <div class="insight-label">Expansión Más Coleccionada</div>
+      <div class="insight-val">${csvN(topEdCount[1].count)}</div>
+      <div class="insight-sub">${esc(topEdCount[0])} (Cartas)</div>
+    </div>
+    
+    <div class="insight-card ${balanceClass}">
+      <div class="insight-icon">⚖️</div>
+      <div class="insight-label">Balance Total (Mercado vs Costo)</div>
+      <div class="insight-val">$${balanceStr}</div>
+      <div class="insight-sub">Inversión: $${csvN(totalCompra)}</div>
+    </div>
+    
+    <div class="insight-card">
+      <div class="insight-icon">🩷</div>
+      <div class="insight-label">Colección Carito</div>
+      <div class="insight-val">$${csvN(caritoVal)}</div>
+      <div class="insight-sub">${csvN(caritoCount)} cartas</div>
+    </div>
+    
+    <div class="insight-card">
+      <div class="insight-icon">💙</div>
+      <div class="insight-label">Colección Infe</div>
+      <div class="insight-val">$${csvN(infeVal)}</div>
+      <div class="insight-sub">${csvN(infeCount)} cartas</div>
+    </div>
+  `;
+  
+  document.getElementById('stats-grid').innerHTML = html;
+  document.getElementById('stats-modal').classList.add('open');
+}
+
+function closeStatsModal() {
+  document.getElementById('stats-modal').classList.remove('open');
+}
+
 /* CLOSE DROPDOWN ON OUTSIDE CLICK */
 document.addEventListener('click', e => {
   if (!e.target.closest('.code-search-box')) closeDd();
