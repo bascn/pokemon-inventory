@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pokemon Card Inventory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+
+<header>
+  <div class="logo">&#128211;</div>
+  <div class="header-info">
+    <h1>Pokemon Card Inventory</h1>
+    <p>Base de Datos Local &middot; SWSH & SV (Offline)</p>
+  </div>
+  <div class="header-right">
+    <div class="api-status">
+      <div class="api-dot online" id="api-dot"></div>
+      <span id="api-label">BD Local</span>
+    </div>
+    <button class="btn-hdr" onclick="exportCSV()">&#11015; Exportar CSV</button>
+  </div>
+</header>
+
+<main>
+  <aside class="panel">
+    <div class="panel-hd">Nueva Carta</div>
+
+    <div class="owner-grid">
+      <button class="owner-btn carito active" id="btn-carito" onclick="setOwner('Carito')">&#128150; Carito</button>
+      <button class="owner-btn infe"           id="btn-infe"   onclick="setOwner('Infe')">&#9889; Infe</button>
+    </div>
+
+    <!-- UNIFIED CODE SEARCH -->
+    <div class="section-label">&#128269; Buscar por Codigo</div>
+    <div class="code-search-box">
+      <div class="field" style="position:relative">
+        <label class="lbl">Codigo de carta <span class="hint">(ej: 142/142 &bull; 079/088)</span></label>
+        <div class="code-input-wrap">
+          <input type="text" id="code-input" placeholder="142/142" autocomplete="off"
+            oninput="onCodeInput(this.value)" onkeydown="onCodeKeydown(event)"/>
+          <div class="code-spinner" id="code-spinner"></div>
+        </div>
+        <div class="dropdown" id="set-dropdown"></div>
+      </div>
+      <div class="card-result" id="card-result">
+        <div class="card-thumb">
+          <div class="card-thumb-ph" id="card-img-ph">&#128211;</div>
+          <img id="card-img" src="" style="display:none" class="card-thumb-img"
+            onerror="this.style.display='none';document.getElementById('card-img-ph').style.display='flex'"/>
+        </div>
+        <div class="card-result-info">
+          <div class="cr-name" id="cr-name"></div>
+          <div id="cr-badges" style="margin-top:4px"></div>
+          <div class="cr-set" id="cr-set"></div>
+        </div>
+        <button class="cr-clear" onclick="resetSearch()" title="Limpiar busqueda">&#10005;</button>
+      </div>
+      <div class="card-msg" id="card-msg"></div>
+    </div>
+
+    <!-- EDITABLE FIELDS -->
+    <div class="section-label">&#9999;&#65039; Datos <span class="hint">(todos editables)</span></div>
+    <div class="form-grid">
+      <div class="field full">
+        <label class="lbl">Nombre *</label>
+        <input type="text" id="f-nombre" placeholder="Nombre de la carta"/>
+      </div>
+      <div class="field">
+        <label class="lbl">Codigo *</label>
+        <input type="text" id="f-codigo" placeholder="079/088"/>
+      </div>
+      <div class="field">
+        <label class="lbl">Idioma</label>
+        <select id="f-idioma">
+          <option value="Ingles">Ingles</option>
+          <option value="Espanol">Espanol</option>
+          <option value="Japones">Japones</option>
+          <option value="Frances">Frances</option>
+          <option value="Aleman">Aleman</option>
+          <option value="Italiano">Italiano</option>
+          <option value="Portugues">Portugues</option>
+          <option value="Coreano">Coreano</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Rareza <span class="hint">(editable)</span></label>
+        <select id="f-rareza">
+          <option value="ACE SPEC Rare">ACE SPEC Rare</option>
+          <option value="Cosmos Holo">Cosmos Holo</option>
+          <option value="Dusk Ball Pattern">Dusk Ball Pattern</option>
+          <option value="Energy Symbol">Energy Symbol</option>
+          <option value="Friend Ball Pattern">Friend Ball Pattern</option>
+          <option value="Full Art">Full Art</option>
+          <option value="Holo">Holo</option>
+          <option value="Holo Liga">Holo Liga</option>
+          <option value="Holo Reverse">Holo Reverse</option>
+          <option value="Holo Reverse Liga">Holo Reverse Liga</option>
+          <option value="Holo Stamp">Holo Stamp</option>
+          <option value="Holo Trick or Trade">Holo Trick or Trade</option>
+          <option value="Hyper Rare">Hyper Rare</option>
+          <option value="Illustration Rare">Illustration Rare</option>
+          <option value="Love Ball Pattern">Love Ball Pattern</option>
+          <option value="Master Ball Pattern">Master Ball Pattern</option>
+          <option value="Mega Attack Rare">Mega Attack Rare</option>
+          <option value="Mega Ultra Rare">Mega Ultra Rare</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="Normal Liga">Normal Liga</option>
+          <option value="Normal Trick or Trade">Normal Trick or Trade</option>
+          <option value="Poke Ball Pattern">Poke Ball Pattern</option>
+          <option value="Promo">Promo</option>
+          <option value="Quick Ball Pattern">Quick Ball Pattern</option>
+          <option value="Secret Rare">Secret Rare</option>
+          <option value="Shiny Rare">Shiny Rare</option>
+          <option value="Special Art Rare">Special Art Rare</option>
+          <option value="Special Illustration">Special Illustration</option>
+          <option value="Special Illustration Rare">Special Illustration Rare</option>
+          <option value="Team Rocket Pattern">Team Rocket Pattern</option>
+          <option value="Ultra Rare">Ultra Rare</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Tipo / Subtipo</label>
+        <select id="f-tipo">
+          <option value="Normal">Normal</option>
+          <option value="Fuego">Fuego</option>
+          <option value="Agua">Agua</option>
+          <option value="Planta">Planta</option>
+          <option value="Electrico">Electrico</option>
+          <option value="Psiquico">Psiquico</option>
+          <option value="Lucha">Lucha</option>
+          <option value="Oscuridad">Oscuridad</option>
+          <option value="Metal">Metal</option>
+          <option value="Acero">Acero</option>
+          <option value="Dragon">Dragon</option>
+          <option value="Hada">Hada</option>
+          <option value="Incoloro">Incoloro</option>
+          <option value="Partidario">Partidario</option>
+          <option value="Objeto">Objeto</option>
+          <option value="Herramienta">Herramienta</option>
+          <option value="Estadio">Estadio</option>
+          <option value="Energia">Energia</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Estado</label>
+        <select id="f-estado">
+          <option value="Excelente">Excelente</option>
+          <option value="Muy Bueno">Muy Bueno</option>
+          <option value="Bueno">Bueno</option>
+          <option value="Regular">Regular</option>
+          <option value="Malo">Malo</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label class="lbl">Edicion / Set</label>
+        <input type="text" id="f-edicion" placeholder="ej: Perfect Order"/>
+      </div>
+    </div>
+
+    <!-- PRICES -->
+    <div class="price-box">
+      <div class="section-label" style="margin-top:0;margin-bottom:12px">&#128176; Cantidad &amp; Precios</div>
+      <div class="form-grid">
+        <div class="field">
+          <label class="lbl">Cantidad *</label>
+          <input type="number" id="f-cantidad" min="1" value="1" oninput="recalc()"/>
+        </div>
+        <div class="field">
+          <label class="lbl">Precio (sin IVA)</label>
+          <input type="number" id="f-precio" placeholder="300" min="0" step="1" oninput="recalc()"/>
+        </div>
+        <div class="field">
+          <label class="lbl">Precio c/ IVA</label>
+          <input type="number" id="f-precioiva" placeholder="315" min="0" step="1" oninput="recalc()"/>
+        </div>
+        <div class="field" style="visibility:hidden"></div>
+        <div class="price-computed">
+          <label class="lbl">Valor 1 (Cant x Precio)</label>
+          <span class="val" id="calc-v1">&#8212;</span>
+        </div>
+        <div class="price-computed">
+          <label class="lbl">Valor 2 (Cant x P.IVA)</label>
+          <span class="val" id="calc-v2">&#8212;</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-add" onclick="addEntry()">+ Agregar Carta</button>
+  </aside>
+
+  <div class="right-col">
+    <div class="stats">
+      <div class="stat"><div class="stat-lbl">Entradas</div><div class="stat-val" id="st-entries">0</div></div>
+      <div class="stat"><div class="stat-lbl">Total Cartas</div><div class="stat-val" id="st-cards">0</div></div>
+      <div class="stat"><div class="stat-lbl">Valor 1 Total</div><div class="stat-val" id="st-v1">$0</div></div>
+      <div class="stat"><div class="stat-lbl">Valor 2 Total</div><div class="stat-val" id="st-v2">$0</div></div>
+    </div>
+    <div class="tpanel">
+      <div class="tpanel-hd">
+        <h2>&#128203; Inventario</h2>
+        <div class="tpanel-actions">
+          <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleImportCSV(event)"/>
+          <button class="btn btn-ghost" onclick="document.getElementById('csv-file').click()">&#128194; Importar CSV</button>
+          <button class="btn btn-ghost" onclick="clearInventory()">&#128465; Limpiar</button>
+          <button class="btn btn-green" onclick="exportCSV()">&#11015; Exportar CSV</button>
+        </div>
+      </div>
+      <div class="search-input-wrap">
+        <input type="text" id="tbl-search" placeholder="Buscar por nombre, codigo, edicion, tipo..." oninput="renderTable()"/>
+      </div>
+      <div class="filters-bar">
+        <select id="flt-dueno" onchange="renderTable()"><option value="">Todos los Dueños</option></select>
+        <select id="flt-rareza" onchange="renderTable()"><option value="">Todas las Rarezas</option></select>
+        <select id="flt-tipo" onchange="renderTable()"><option value="">Todos los Tipos</option></select>
+        <select id="flt-estado" onchange="renderTable()"><option value="">Todos los Estados</option></select>
+        <select id="flt-idioma" onchange="renderTable()"><option value="">Todos los Idiomas</option></select>
+      </div>
+      <div class="tscroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Codigo</th><th>Idioma</th><th>Rareza</th><th>Tipo</th>
+              <th>Edicion</th><th>Estado</th><th>Dueno</th><th>Cant.</th>
+              <th>P.IVA</th><th>Precio</th><th>Valor 1</th><th>Valor 2</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+        <div class="empty" id="empty-state">
+          <div class="ei">&#128230;</div>
+          <p>Sin cartas en el inventario.<br/>Ingresa un codigo como <strong>142/142</strong> para comenzar.</p>
+        </div>
+      </div>
+      <div class="pagination-bar" id="pagination-bar" style="display:none">
+        <div class="pag-info">
+          <select id="pag-size" onchange="changePageSize()">
+            <option value="50">50 / pág</option>
+            <option value="100" selected>100 / pág</option>
+            <option value="250">250 / pág</option>
+          </select>
+          <span id="pag-text">Página 1 de 1</span>
+        </div>
+        <div class="pag-controls">
+          <button class="btn btn-ghost" id="pag-prev" onclick="prevPage()">Anterior</button>
+          <button class="btn btn-ghost" id="pag-next" onclick="nextPage()">Siguiente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"><span id="toast-msg">OK</span></div>
+<script src="database.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
